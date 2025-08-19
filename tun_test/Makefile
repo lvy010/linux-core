@@ -2,45 +2,63 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -O2
-TARGET = tun_test
-SOURCE = tun_test.c
+TARGETS = tun_test tun_router
+SOURCES = tun_test.c tun_router.c network_utils.c
 
 # 默认目标
-all: $(TARGET)
+all: $(TARGETS)
 
 # 编译目标
-$(TARGET): $(SOURCE)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SOURCE)
-	@echo "编译完成: $(TARGET)"
+tun_test: tun_test.c
+	$(CC) $(CFLAGS) -o tun_test tun_test.c
+	@echo "编译完成: tun_test"
+
+tun_router: tun_router.c network_utils.c network_utils.h
+	$(CC) $(CFLAGS) -o tun_router tun_router.c network_utils.c
+	@echo "编译完成: tun_router"
 
 # 清理编译生成的文件
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGETS)
 	@echo "清理完成"
 
 # 安装（复制到 /usr/local/bin）
-install: $(TARGET)
-	sudo cp $(TARGET) /usr/local/bin/
-	@echo "安装完成: /usr/local/bin/$(TARGET)"
+install: $(TARGETS)
+	sudo cp tun_test /usr/local/bin/
+	sudo cp tun_router /usr/local/bin/
+	@echo "安装完成"
 
 # 卸载
 uninstall:
-	sudo rm -f /usr/local/bin/$(TARGET)
+	sudo rm -f /usr/local/bin/tun_test
+	sudo rm -f /usr/local/bin/tun_router
 	@echo "卸载完成"
 
-# 运行测试（仅创建设备）
-test: $(TARGET)
-	@echo "运行测试模式..."
-	sudo ./$(TARGET) -t
+# 运行基本测试
+test: tun_test
+	@echo "运行基本测试模式..."
+	sudo ./tun_test -t
 
-# 运行完整测试（需要手动停止）
-run: $(TARGET)
-	@echo "运行完整测试（按 Ctrl+C 停止）..."
-	sudo ./$(TARGET)
+# 运行网络测试
+test-network: all
+	@echo "运行网络功能测试..."
+	chmod +x network_test.sh
+	sudo ./network_test.sh
+
+# 设置 VPN 服务器
+setup-vpn: all
+	@echo "设置 VPN 服务器..."
+	chmod +x setup_vpn_server.sh
+	sudo ./setup_vpn_server.sh
+
+# 运行 TUN 路由器
+run-router: tun_router
+	@echo "运行 TUN 路由器（按 Ctrl+C 停止）..."
+	sudo ./tun_router -h
 
 # 显示帮助
-help: $(TARGET)
-	./$(TARGET) -h
+help: tun_test
+	./tun_test -h
 
 # 检查代码风格
 check:
