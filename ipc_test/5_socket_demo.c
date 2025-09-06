@@ -128,7 +128,10 @@ void unix_socket_server() {
             
             // 发送回复
             char reply[BUFFER_SIZE];
-            snprintf(reply, sizeof(reply), "Echo: %s", buffer);
+            int reply_len = snprintf(reply, sizeof(reply), "Echo: %s", buffer);
+            if (reply_len >= (int)sizeof(reply)) {
+                reply[sizeof(reply)-1] = '\0'; // 确保字符串终止
+            }
             send(client_fd, reply, strlen(reply), 0);
             
             if (strcmp(buffer, "quit") == 0) {
@@ -151,7 +154,6 @@ void unix_socket_server() {
 void unix_socket_client() {
     int client_fd;
     struct sockaddr_un server_addr;
-    char buffer[BUFFER_SIZE];
     char reply[BUFFER_SIZE];
     ssize_t bytes_sent, bytes_received;
     
@@ -285,7 +287,10 @@ void inet_socket_server() {
             
             // 发送回复
             char reply[BUFFER_SIZE];
-            snprintf(reply, sizeof(reply), "Server Echo: %s", buffer);
+            int reply_len = snprintf(reply, sizeof(reply), "Server Echo: %s", buffer);
+            if (reply_len >= (int)sizeof(reply)) {
+                reply[sizeof(reply)-1] = '\0'; // 确保字符串终止
+            }
             send(client_fd, reply, strlen(reply), 0);
             
             if (strcmp(buffer, "quit") == 0) {
@@ -307,7 +312,6 @@ void inet_socket_server() {
 void inet_socket_client() {
     int client_fd;
     struct sockaddr_in server_addr;
-    char buffer[BUFFER_SIZE];
     char reply[BUFFER_SIZE];
     ssize_t bytes_sent, bytes_received;
     
@@ -439,7 +443,10 @@ void demo_udp_socket() {
                 
                 // 发送回复
                 char reply[BUFFER_SIZE];
-                snprintf(reply, sizeof(reply), "UDP Echo: %s", buffer);
+                int reply_len = snprintf(reply, sizeof(reply), "UDP Echo: %s", buffer);
+                if (reply_len >= (int)sizeof(reply)) {
+                    reply[sizeof(reply)-1] = '\0'; // 确保字符串终止
+                }
                 sendto(server_fd, reply, strlen(reply), 0,
                        (struct sockaddr*)&client_addr, client_len);
             }
