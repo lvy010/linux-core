@@ -1,2 +1,2 @@
 # linux-core
-code note
+code
